@@ -1,0 +1,25 @@
+<apex:page controller="DocusignAPI">
+    <apex:outputPanel id="opMsgs">
+        <apex:PageMessages />
+    </apex:outputPanel>
+    
+    <apex:form id="frmMain">
+
+        <apex:pageBlock title="Authorization using OAuth">
+            <apex:outputPanel id="opInputs">
+                Enter User name &nbsp;&nbsp;<apex:inputText id="username" value="{!userName}" style="width:400px"/>
+                <br></br>         
+                <br></br> 
+                Enter Password &nbsp;&nbsp;<apex:inputText id="password" value="{!password}" style="width:400px"/>
+                <br></br>         
+                <br></br>    
+                Enter Integration Key &nbsp;&nbsp;<apex:inputText id="integrationkey" value="{!integrationKey}" style="width:400px"/>
+            </apex:outputPanel>
+            <apex:actionStatus startText=" (Please wait ...)" stopText=" (ready)" id="launch-status"/>
+    
+            <apex:commandButton value="Docusign Authorization" action="{!getOAuthToken}"  status="launch-status" reRender="opMsgs">
+            </apex:commandButton>
+       </apex:pageBlock>
+   </apex:form>
+   
+</apex:page>

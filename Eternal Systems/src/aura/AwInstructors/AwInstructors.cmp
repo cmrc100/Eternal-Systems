@@ -1,0 +1,55 @@
+<aura:component implements="flexipage:availableForAllPageTypes,force:appHostable" 
+   access="global">
+
+	<style>
+	  div.pullToRefresh + div {
+	    height: 100%;
+	  }
+	
+	  .viewport {
+	    height: 100%;
+	  }
+	
+	  .scroller.actionBarPlugin {
+	   padding-bottom: 0px !important;
+	   height: 100%;
+	  }
+	</style>
+
+	<div aura:id="modalspinner" class="slds-align--absolute-center slds_hide">
+		<lightning:spinner variant="brand" size="large" />
+	</div>
+  	
+  	<aura:handler event="aura:waiting"
+  		action="{!c.showSpinner}" />
+
+	<aura:handler event="aura:doneWaiting"
+  		action="{!c.hideSpinner}" />
+  	
+  <c:modalDialog title="Welcome User!">
+  	<p> Use this application to manage your teaching assignments </p>
+  </c:modalDialog>
+  
+  <div aura:id = "mainApp">
+	  <lightning:tabset >
+	    <lightning:tab label="News" 
+	                   title="News">
+	           <ui:scrollerWrapper >
+	           	<forceChatter:feed type="groups" />
+	           </ui:scrollerWrapper>	
+	    </lightning:tab>
+	    <lightning:tab label="Students" 
+	                   title="Students">
+			<c:AwInstructors_Students />
+	    </lightning:tab>
+	    <lightning:tab label="Report"
+	                   title="Report">
+	           <c:Titlebar title="Trip Reports" />
+	    </lightning:tab>
+	    <lightning:tab label="Panic" title="Panic">
+	        <c:PanicTools />
+	    </lightning:tab>
+	  </lightning:tabset>
+  </div>
+  
+</aura:component>

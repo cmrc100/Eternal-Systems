@@ -1,0 +1,15 @@
+<apex:page controller="GoogleCalendarAPI" action="{!retrieveCode}">
+
+    <apex:form >
+        <apex:pageMessages />
+        <apex:outputPanel rendered="true">
+            <apex:outputText value="{!sAuthoriseMsg}" />
+            <apex:commandButton value="Confirm" disabled="{!bCodeReturned == false}" >
+                <apex:actionsupport event="oncomplete" action="{!retrieveToken}"/>
+            </apex:commandButton>
+        </apex:outputPanel>
+  
+    
+    </apex:form>
+
+</apex:page>

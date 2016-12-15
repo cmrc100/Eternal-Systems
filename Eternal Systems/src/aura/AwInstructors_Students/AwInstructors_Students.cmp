@@ -1,0 +1,60 @@
+<aura:component extends="c:DataComponent">
+	
+	<aura:attribute name="currentView" 
+	                    type="String"  
+	                    access="PRIVATE"
+	                    default="searchForm"
+	                    description="The currently active view" />
+	
+	<aura:attribute name="currentRecordId" 
+	                    type="String"  
+	                    access="PRIVATE"	                    
+	                    description="The currently selected record" />
+	                    	
+	<aura:handler name="formsubmit"
+		event="c:FormSubmit"
+		action="{!c.onQbeFormSubmit}" />
+
+	<aura:handler name="backbuttonpress"
+		event="c:BackButtonPress"
+		action="{!c.onBack}" />
+
+	<aura:handler name="recordaction"
+		event="c:recordAction"
+		action="{!c.onRecordAction}" />
+
+	<aura:handler name="onSaveSuccess"
+		event="force:recordSaveSuccess"
+		action="{!c.onSaveSuccess}" />		
+					
+	<div class="cardContainer" aura:id="cardContainer">      
+	    <div aura:id="searchForm" class="card">
+	        <c:StudentQBEForm />
+	    </div>
+	
+	     <div aura:id="studentList" class="card card--off">
+			<c:StudentList aura:id="studentListCmp" />
+	     </div>
+	
+	     <div aura:id="studentDetailView" class="card card--off">
+			<c:Titlebar title="Student Detail" buttonRight="false" buttonLeft="true" />
+			<div class="slds-scrollable--y" style="height:calc(100% - 50px)" >
+				<force:recordView recordId="{!v.currentRecordId}" />
+			</div>
+	     </div>
+	
+	     <div aura:id="studentEditView" class="card card--off">
+			<c:Titlebar title="Edit Student Info" 
+							buttonRight="true" 
+							buttonRightIcon="utility:check" 
+							buttonRightAction="{!c.onSaveBtnPress}" 
+							buttonLeft="true"  />
+			<div class="slds-scrollable--y" style="height:calc(100% - 50px)" >
+				<force:recordEdit aura:id="recordEditView" recordId="{!v.currentRecordId}" />
+			</div>	
+	     </div>
+	</div>
+	
+	{!v.body}	
+<div aura:id="optionalModalDialog" />	
+</aura:component>

@@ -1,0 +1,347 @@
+<apex:page Controller="AnalyticSearchController">
+      <script type="text/javascript">
+      
+          function doSearch(sFrom) {
+          
+          var bRun = false;
+
+          if (sFrom != 'button'){
+              bRun = "{!dynamicSearching}";
+          } else {
+              bRun = true;
+          }           
+
+          if (bRun == 'true'){
+            searchServer();                    
+          } 
+         }
+         
+         
+        function closeExit(){
+            window.history.back();
+        }                       
+
+        function start(){
+            document.getElementById("processingStatus").innerHTML = "Searching ...";
+        }
+    
+        function stop(){
+            document.getElementById("processingStatus").innerHTML = "Ready";               
+        }
+      
+      </script> 
+  <apex:form >
+  <apex:pageMessages id="errors" />
+  <apex:pageBlock title="Search Reports and Dashboards" mode="edit" id="main">
+ 
+  <table width="100%" border="0">
+  <tr>  
+    <td width="200" valign="top">
+ 
+      <apex:pageBlock title="Parameters" mode="edit" id="criteria">
+ 
+      <apex:actionFunction name="searchServer" action="{!runSearch}" rerender="results,errors" status="status">
+      </apex:actionFunction>
+ 
+      <table cellpadding="2" cellspacing="2">
+      <tr>
+        <td style="font-weight:bold;">Layout<br/>
+        <apex:selectList id="layout" value="{!selectedLayout}" onchange="doSearch();" size="2" style="height:40px; width:150px" >
+            <apex:selectOptions value="{!layouts}"/>            
+                <apex:actionSupport event="onchange" reRender="results"/>
+        </apex:selectList><p/>
+        </td>
+      </tr>
+      <tr>
+        <td style="font-weight:bold;">Type<br/>
+        <apex:selectList id="type" value="{!selectedType}" onchange="doSearch();" size="2" style="height:40px; width:150px">
+            <apex:selectOptions value="{!types}"/>
+            <apex:actionSupport event="onchange" rerender="results"/>
+        </apex:selectList>
+        <p/>
+        </td>
+      </tr>
+      <tr>
+        <td style="font-weight:bold;">Focus<br/>
+        <apex:selectList id="focus" value="{!selectedFocus}" onclick="doSearch();" size="4" style="height:80px; width:150px">
+            <apex:selectOptions value="{!focusitems}"/>
+            <apex:actionSupport event="onchange" rerender="results, focusitems, regionfocus, areafocus, communityfocus, contactfocus"/>
+        </apex:selectList>
+        <p/>
+        </td>
+      </tr>      
+      </table>
+      <table cellpadding="2" cellspacing="2">  
+      <apex:outputPanel id="focusitems">
+         <apex:outputPanel id="regionfocus" layout="block">
+         <apex:outputPanel rendered="{!regionSelected}">
+         <tr>
+            <td style="font-weight:bold;">Focus - Region<br/>
+                <apex:selectList id="region" value="{!selectedRegion}" onclick="doSearch();" size="6" style="height:80px; width:150px" rendered="true">
+                    <apex:selectOptions value="{!regions}"/>
+                    <apex:actionSupport event="onchange" reRender="results,focusitems, area,community"/>
+                </apex:selectList><p/>
+            </td>
+          </tr>
+          </apex:outputPanel>
+          </apex:outputPanel>          
+          
+          <apex:outputPanel id="areafocus" >
+          <apex:outputPanel rendered="{!areaSelected}">
+          <tr>
+            <td style="font-weight:bold;">Focus - Area<br/>
+            <apex:actionRegion renderRegionOnly="false">
+                <apex:selectList id="area" value="{!selectedArea}" onclick="doSearch();" size="2" style="height:80px; width:150px">
+                    <apex:selectOptions value="{!areas}"/>
+                          <apex:actionSupport event="onchange" reRender="results,community"/>
+                </apex:selectList><p/>
+            </apex:actionRegion>
+            </td>
+          </tr>
+          </apex:outputPanel>
+          </apex:outputPanel>
+          
+          <apex:outputPanel id="communityfocus" >
+          <apex:outputPanel rendered="{!communitySelected}">
+          <tr>
+            <td style="font-weight:bold;">Focus - Community<br/>
+            <apex:actionRegion renderRegionOnly="false">
+                <apex:selectList id="community" value="{!selectedCommunity}" onclick="doSearch();" size="2" style="height:80px; width:150px">
+                    <apex:selectOptions value="{!communities}"/>
+                </apex:selectList><p/>
+            </apex:actionRegion>
+            </td>
+          </tr>
+          </apex:outputPanel>
+          </apex:outputPanel>
+          
+          <apex:outputPanel id="contactfocus" >
+          <apex:outputPanel rendered="{!contactSelected}">
+          <tr>
+            <td style="font-weight:bold;">Contact<br/>
+            <apex:actionRegion renderRegionOnly="false">
+                <apex:selectList id="contact" value="{!selectedContact}" onclick="doSearch();" size="1" style="width:150px">
+                    <apex:selectOptions value="{!contacts}"/>
+                </apex:selectList><p/>
+            </apex:actionRegion>
+            </td>
+          </tr>
+          </apex:outputPanel>
+          </apex:outputPanel>
+      </apex:outputPanel>
+      </table>
+ 
+    </apex:pageBlock>
+
+    </td>
+    <td valign="top">
+    <apex:pageBlock mode="edit" id="results">
+        <apex:PageBlockSection title="Active Highlighted" columns="1"> 
+        <apex:pageBlockTable value="{!analytics}" var="analytic">
+ 
+           <apex:column >
+                <apex:facet name="header">
+                    <apex:commandLink value="Name" action="{!toggleSort}" rerender="results">
+                        <apex:param name="sortField" value="name" assignTo="{!sortField}"/>
+                    </apex:commandLink>
+                </apex:facet>
+                <apex:outputField value="{!analytic.name}"/>
+            </apex:column>
+
+
+            <apex:column >
+                <apex:facet name="header">
+                    <apex:commandLink value="Type" action="{!toggleSort}" rerender="results">
+                        <apex:param name="sortField" value="type__c" assignTo="{!sortField}"/>
+                    </apex:commandLink>
+                </apex:facet>
+                <apex:outputField value="{!analytic.Type__c}"/>
+            </apex:column>
+
+            <apex:column >
+                <apex:facet name="header">
+                    <apex:commandLink value="Focus" action="{!toggleSort}" rerender="results">
+                        <apex:param name="sortField" value="focus__c" assignTo="{!sortField}"/>
+                    </apex:commandLink>
+                </apex:facet>
+                <apex:outputField value="{!analytic.Focus__c}"/>
+            </apex:column>
+
+
+            <apex:column >
+                <apex:facet name="header">
+                    <apex:commandLink value="Region" action="{!toggleSort}" rerender="results">
+                        <apex:param name="sortField" value="region__c" assignTo="{!sortField}"/>
+                    </apex:commandLink>
+                </apex:facet>
+                <apex:outputField value="{!analytic.Region__c}"/>
+            </apex:column>
+
+
+            <apex:column >
+                <apex:facet name="header">
+                    <apex:commandLink value="Area" action="{!toggleSort}" rerender="results">
+                        <apex:param name="sortField" value="area__c" assignTo="{!sortField}"/>
+                    </apex:commandLink>
+                </apex:facet>
+                <apex:outputField value="{!analytic.Area__c}"/>
+            </apex:column>
+ 
+            <apex:column >
+                <apex:facet name="header">
+                    <apex:commandLink value="Community" action="{!toggleSort}" rerender="results" >
+                        <apex:param name="sortField" value="community__c" assignTo="{!sortField}"/>
+                    </apex:commandLink>
+                </apex:facet>
+                <apex:outputField value="{!analytic.Community__c}"/>
+            </apex:column>
+
+            <apex:column >
+                <apex:facet name="header">
+                    <apex:commandLink value="Highlight" action="{!toggleSort}" rerender="results" >
+                        <apex:param name="sortField" value="highlight__c" assignTo="{!sortField}"/>
+                    </apex:commandLink>
+                </apex:facet>
+                <apex:outputField value="{!analytic.Highlight__c}"/>
+            </apex:column>
+
+            <apex:column >
+                <apex:facet name="header">
+                    <apex:commandLink value="Contact" action="{!toggleSort}" rerender="results" >
+                        <apex:param name="sortField" value="contact__c" assignTo="{!sortField}"/>
+                    </apex:commandLink>
+                </apex:facet>
+                <apex:outputField value="{!analytic.Contact__c}"/>
+            </apex:column>
+
+            <apex:column >
+                <apex:facet name="header">
+                    <apex:commandLink value="Report URL" action="{!toggleSort}" rerender="results">
+                        <apex:param name="sortField" value="url__c" assignTo="{!sortField}"/>
+                    </apex:commandLink>
+                </apex:facet>
+                <apex:outputField value="{!analytic.URL__c}"/>
+            </apex:column> 
+
+        </apex:pageBlockTable>
+        </apex:pageBlockSection>
+
+
+        <apex:PageBlockSection title="All Active" columns="1"> 
+        <apex:pageBlockTable value="{!analyticsAll}" var="analytic">
+ 
+            <apex:column >
+                <apex:facet name="header">
+                    <apex:commandLink value="Name" action="{!toggleSort}" rerender="results">
+                        <apex:param name="sortField" value="name" assignTo="{!sortField}"/>
+                    </apex:commandLink>
+                </apex:facet>
+                <apex:outputField value="{!analytic.name}"/>
+            </apex:column>
+
+            <apex:column >
+                <apex:facet name="header">
+                    <apex:commandLink value="Type" action="{!toggleSort}" rerender="results">
+                        <apex:param name="sortField" value="type__c" assignTo="{!sortField}"/>
+                    </apex:commandLink>
+                </apex:facet>
+                <apex:outputField value="{!analytic.Type__c}"/>
+            </apex:column>
+
+            <apex:column >
+                <apex:facet name="header">
+                    <apex:commandLink value="Focus" action="{!toggleSort}" rerender="results">
+                        <apex:param name="sortField" value="focus__c" assignTo="{!sortField}"/>
+                    </apex:commandLink>
+                </apex:facet>
+                <apex:outputField value="{!analytic.Focus__c}"/>
+            </apex:column>
+
+            <apex:column >
+                <apex:facet name="header">
+                    <apex:commandLink value="Region" action="{!toggleSort}" rerender="results">
+                        <apex:param name="sortField" value="region__c" assignTo="{!sortField}"/>
+                    </apex:commandLink>
+                </apex:facet>
+                <apex:outputField value="{!analytic.Region__c}"/>
+            </apex:column>
+
+            <apex:column >
+                <apex:facet name="header">
+                    <apex:commandLink value="Area" action="{!toggleSort}" rerender="results">
+                        <apex:param name="sortField" value="area__c" assignTo="{!sortField}"/>
+                    </apex:commandLink>
+                </apex:facet>
+                <apex:outputField value="{!analytic.Area__c}"/>
+            </apex:column>
+ 
+            <apex:column >
+                <apex:facet name="header">
+                    <apex:commandLink value="Community" action="{!toggleSort}" rerender="results" >
+                        <apex:param name="sortField" value="community__c" assignTo="{!sortField}"/>
+                    </apex:commandLink>
+                </apex:facet>
+                <apex:outputField value="{!analytic.Community__c}"/>
+            </apex:column>
+
+            <apex:column >
+                <apex:facet name="header">
+                    <apex:commandLink value="Highlight" action="{!toggleSort}" rerender="results" >
+                        <apex:param name="sortField" value="highlight__c" assignTo="{!sortField}"/>
+                    </apex:commandLink>
+                </apex:facet>
+                <apex:outputField value="{!analytic.Highlight__c}"/>
+            </apex:column>
+
+            <apex:column >
+                <apex:facet name="header">
+                    <apex:commandLink value="Contact" action="{!toggleSort}" rerender="results" >
+                        <apex:param name="sortField" value="contact__c" assignTo="{!sortField}"/>
+                    </apex:commandLink>
+                </apex:facet>
+                <apex:outputField value="{!analytic.Contact__c}"/>
+            </apex:column>
+
+            <apex:column >
+                <apex:facet name="header">
+                    <apex:commandLink value="Report URL" action="{!toggleSort}" rerender="results">
+                        <apex:param name="sortField" value="url__c" assignTo="{!sortField}"/>
+                    </apex:commandLink>
+                </apex:facet>
+                <apex:outputField value="{!analytic.URL__c}"/>
+            </apex:column> 
+        </apex:pageBlockTable>
+        </apex:pageBlockSection>
+
+
+    </apex:pageBlock>
+ 
+    </td>
+   </tr>
+  </table>
+  
+ 
+  </apex:pageBlock>
+     <apex:commandButton id="btnSearch" value="Search" rendered="true" rerender="results">
+          <apex:actionsupport event="oncomplete" action="{!runSearch}" rerender="results" status="status"/>
+     </apex:commandButton>
+     
+     <apex:commandButton action="{!Clear}" value="Clear" id="btnClear"  rerender="main">
+          <apex:actionsupport event="oncomplete" />
+     </apex:commandButton>
+     
+     <apex:commandButton action="{!closeWin}" value="Close" id="btnClose" oncomplete="closeExit();">
+          <apex:actionsupport event="oncomplete" />
+     </apex:commandButton>
+     
+  </apex:form>
+ 
+      <apex:actionStatus id="status" onStart="start();" onstop="stop,stop();">
+          <apex:facet name="stop">
+
+          </apex:facet>
+      </apex:actionStatus>
+
+      <p><div id="processingStatus"></div></p>
+
+</apex:page>

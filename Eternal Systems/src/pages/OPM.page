@@ -1,0 +1,261 @@
+<apex:page controller="OPMController" >
+
+    <!-- Adding styles required for loading or processing popup  -->
+    <style>
+        .popupBackground {
+            background-color:black;
+            opacity: 0.20;
+            filter: alpha(opacity = 20);
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            z-index: 998;
+            position: absolute;
+        }
+        .popupPanel {
+            border: solid 1px;
+            background-color: white;
+            left: 50%;
+            width: 200px;
+            margin-left: -100px;
+            top: 50%;
+            height: 50px;
+            margin-top: -25px;
+            z-index: 999;
+            position: fixed;
+        }
+    </style>
+
+    <script type="text/javascript">
+      
+        function doFilter() {
+            applyFilter();  
+        }
+
+    </script> 
+
+    <!-- "Loading" or "Processing" popup whenever we are saving/querying.  -->
+    <apex:actionStatus id="processingStatus" stopText=""  >
+        <apex:facet name="start">
+            <div>
+                <div class="popupBackground" />
+                <div class="popupPanel">
+                    <table border="0" width="100%" height="100%">
+                        <tr>
+                            <td align="center" style="font-family: Calibri; font-size: 13px; font-weight: normal;"><b>Processing... Please Wait</b></td>
+                        </tr>
+                        <tr>
+                            <td align="center"><img src="/img/loading.gif"/></td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </apex:facet>
+    </apex:actionStatus>
+            
+    <apex:form id="frmMain">
+        <apex:pageMessages id="errors" />
+        <apex:pageBlock title="Opportunity Probabililty Management - Configuration" mode="edit" id="main">
+
+        <apex:actionFunction name="applyFilter" action="{!applyFilter}" rerender="errors, opSummary" status="processingStatus">
+        </apex:actionFunction>
+ 
+        <table width="100%" border="0">
+            <tr>  
+                <td width="200" valign="top">
+
+                    <apex:pageBlock title="Create New" mode="edit" id="criteria">
+                        <apex:PageBlockButtons location="bottom">
+                            <apex:commandButton value="Save New Record" action="{!saveNew}" status="processingStatus" reRender="opSummary, errors">
+                            </apex:commandButton>
+                            <apex:commandButton action="{!callApplyUpdateNew}" value="Apply"/>
+                        </apex:pageBlockButtons>  
+                        <table cellpadding="2" cellspacing="2">
+                            <tr>
+                                <td style="font-weight:bold;">Role<br/>
+                                    <c:RoleTreeViewComponent selectableNodes="true"  value="{!selectedValues}" JSONTreeData="{!JSONString}" />   
+                                    <br></br> Include Subordinates <apex:inputCheckbox value="{!newSubordinates}"/>
+                                    <br></br>
+                                    <br></br>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="font-weight:bold;">Product Line<br/>
+                                    <apex:selectList id="productLines" value="{!newProductLine}" size="1" style="height:20px; width:280px" >
+                                        <apex:selectOptions value="{!ProductLines}"/>            
+                                    </apex:selectList><p/>
+                                </td>
+                            </tr>
+                            
+                            <tr>
+                                <td style="font-weight:bold;">Stage<br/>
+                                    <apex:selectList id="stages" value="{!newStage}" size="1" style="height:20px; width:280px" >
+                                        <apex:selectOptions value="{!Stages}"/>            
+                                    </apex:selectList><p/>
+                                </td>
+                            </tr>                            
+                            <tr>
+                                <td style="font-weight:bold;">Probability %<br/>
+                                    <apex:InputText value="{!newProbability}" style="height:20px; width:100px"/><p/>
+                                </td>
+                            </tr>  
+                                                                                    
+                        </table>
+                    </apex:pageBlock>    
+                </td>
+                    
+
+                <td valign="top">
+
+                    <apex:pageBlock mode="edit" id="summary" >
+                        <apex:PageBlockButtons location="bottom">
+                            <apex:commandButton value="Save" >
+                                <apex:actionSupport action="{!save}" event="oncomplete" status="processingStatus" reRender="opSummary, errors"/>
+                            </apex:commandButton>
+                            <apex:commandButton action="{!callApplyUpdate}" value="Apply"/>
+                        </apex:pageBlockButtons>
+                       <apex:pageBlockSection columns="4"  >
+                           <b> Filter By: </b> 
+                           <apex:selectList id="filterRole" value="{!filterRole}" size="1" onchange="doFilter();" style="height:20px; width:230px" label="Role" >
+                               <apex:selectOptions value="{!Roles}"/>
+                               <apex:actionSupport event="onchange" rerender="opSummary"/>            
+                           </apex:selectList>
+                           <apex:selectList id="filterProductLine" value="{!filterProductLine}" size="1" onchange="doFilter();" style="height:20px; width:230px" label="Prod. Line" >
+                               <apex:selectOptions value="{!ProductLines}"/>
+                               <apex:actionSupport event="onchange" rerender="opSummary"/>             
+                           </apex:selectList> 
+                           <apex:selectList id="filterStage" value="{!filterStage}" size="1" onchange="doFilter();" style="height:20px; width:200px" label="Stage" >
+                               <apex:selectOptions value="{!Stages}"/>
+                               <apex:actionSupport event="onchange" rerender="opSummary"/>            
+                           </apex:selectList>                                            
+                       </apex:pageBlockSection>
+                        
+                    <apex:outputPanel id="opSummary">
+                    <apex:outputPanel >                        
+                        <apex:PageBlockSection title="Probability Configuration Summary" columns="1" collapsible="false">                          
+
+                            <apex:pageBlockTable value="{!OPMList}" var="opm" columnsWidth="5%,25%,5%,20%,15%,10%,5%, 5%, 5%">
+ 
+                               <apex:column value="{!opm.Active__c}">
+                                    <apex:facet name="header">
+                                        <apex:commandLink value="Active" action="{!toggleSort}" rerender="opSummary" status="processingStatus">
+                                            <apex:param name="sortField" value="active__c" assignTo="{!sortField}"/>
+                                            <apex:outputPanel rendered="{!BEGINS(sortField,'active__c')}">
+                                                &nbsp;<apex:image value="{!IF(sortDir = 'desc','/img/arrowDown.gif','/img/arrowUp.gif')}"/>
+                                            </apex:outputPanel> 
+                                        </apex:commandLink>
+                                    </apex:facet>                               
+                               </apex:column>
+                               <apex:column value="{!opm.Role_Name__c}">
+                                    <apex:facet name="header">
+                                        <apex:commandLink value="Role" action="{!toggleSort}" rerender="opSummary" status="processingStatus">
+                                            <apex:param name="sortField" value="role_name__c" assignTo="{!sortField}"/>
+                                            <apex:outputPanel rendered="{!BEGINS(sortField,'role_name__c')}">
+                                                &nbsp;<apex:image value="{!IF(sortDir = 'desc','/img/arrowDown.gif','/img/arrowUp.gif')}"/>
+                                            </apex:outputPanel> 
+                                        </apex:commandLink>
+                                    </apex:facet>
+                               </apex:column>
+                               <apex:column value="{!opm.Subordinates_Included__c}">
+                                    <apex:facet name="header">
+                                        <apex:commandLink value="Inc. Subordinates" action="{!toggleSort}" rerender="opSummary" status="processingStatus">
+                                            <apex:param name="sortField" value="subordinates_Included__c" assignTo="{!sortField}"/>
+                                            <apex:outputPanel rendered="{!BEGINS(sortField,'subordinates_Included__c')}">
+                                                &nbsp;<apex:image value="{!IF(sortDir = 'desc','/img/arrowDown.gif','/img/arrowUp.gif')}"/>
+                                            </apex:outputPanel>                                             
+                                        </apex:commandLink>
+                                    </apex:facet>                                
+                               </apex:column>
+                               <apex:column value="{!opm.Product_Line__c}">
+                                    <apex:facet name="header">
+                                        <apex:commandLink value="Product Line" action="{!toggleSort}" rerender="opSummary" status="processingStatus">
+                                            <apex:param name="sortField" value="product_line__c" assignTo="{!sortField}"/>
+                                            <apex:outputPanel rendered="{!BEGINS(sortField,'product_line__c')}">
+                                                &nbsp;<apex:image value="{!IF(sortDir = 'desc','/img/arrowDown.gif','/img/arrowUp.gif')}"/>
+                                            </apex:outputPanel>                                             
+                                        </apex:commandLink>
+                                    </apex:facet>                               
+                               </apex:column>                                     
+                               <apex:column value="{!opm.Stage__c}">
+                                    <apex:facet name="header">
+                                        <apex:commandLink value="Stage" action="{!toggleSort}" rerender="opSummary" status="processingStatus">
+                                            <apex:param name="sortField" value="stage__c" assignTo="{!sortField}"/>
+                                            <apex:outputPanel rendered="{!BEGINS(sortField,'stage__c')}">
+                                                &nbsp;<apex:image value="{!IF(sortDir = 'desc','/img/arrowDown.gif','/img/arrowUp.gif')}"/>
+                                            </apex:outputPanel>                                             
+                                        </apex:commandLink>
+                                    </apex:facet>
+                               </apex:column>                                
+                               <apex:column >
+                                    <apex:facet name="header">
+                                        <apex:commandLink value="Probability" action="{!toggleSort}" rerender="opSummary" status="processingStatus">
+                                            <apex:param name="sortField" value="probability__c" assignTo="{!sortField}"/>
+                                            <apex:outputPanel rendered="{!BEGINS(sortField,'probability__c')}">
+                                                &nbsp;<apex:image value="{!IF(sortDir = 'desc','/img/arrowDown.gif','/img/arrowUp.gif')}"/>
+                                            </apex:outputPanel>                                             
+                                        </apex:commandLink>
+                                    </apex:facet>
+                                    <apex:outputField value="{!opm.Probability__c}">
+                                        <apex:inlineEditSupport event="ondblclick" showOnEdit="update"/>
+                                    </apex:outputField>                                  
+                               </apex:column>                           
+                                <apex:column >
+                                     <apex:commandLink title="Del" value="Del"  style="color:blue;"  action="{!deleteRecord}" >
+                                         <apex:param name="rec" assignTo="{!selectedItem}" value="{!opm.Id}"/>
+                                         <apex:actionSupport event="oncomplete" rerender="opSummary" status="processingStatus"/>
+                                     </apex:commandLink>
+                                </apex:column> 
+                                <apex:column >
+                                     <apex:commandLink action="{!activation}" title="Activation" value="{!IF(opm.Active__c = true,'Deactivate','Activate')}"  style="color:blue;" >
+                                         <apex:param name="rec" assignTo="{!selectedItem}" value="{!opm.Id}"/>
+                                         <apex:actionSupport event="oncomplete" rerender="opSummary" status="processingStatus"/>
+                                     </apex:commandLink>
+                                </apex:column>                                             
+                            </apex:pageBlockTable>
+
+                            <apex:pageBlocksectionitem >
+                            <apex:outputPanel id="pagination">
+                            <apex:outputPanel >
+                                    Page &nbsp;<apex:outputText value="{!currentPage}"/> / <apex:outputText value="{!totalPages}"/>&nbsp;&nbsp;&nbsp;|&nbsp;
+                                    <apex:outputPanel rendered="{!currentPage>1}">
+                                        <apex:commandLink action="{!firstPage}" rerender="opSummary,pagination" >First Page</apex:commandLink>&nbsp;|&nbsp;
+                                        <apex:commandLink action="{!prevPage}"  rerender="opSummary,pagination" >Previous Page</apex:commandLink>
+                                    </apex:outputPanel>
+                                    <apex:outputPanel rendered="{!NOT(currentPage>1)}">
+                                        <i style="color:gray">First Page</i>&nbsp;|&nbsp;
+                                        <i style="color:gray">Previous Page</i>
+                                    </apex:outputPanel>
+                                    &nbsp;|&nbsp;
+                                    <apex:outputPanel rendered="{!currentPage < totalPages && totalPages>1}">
+                                        <apex:commandLink action="{!nextPage}"  rerender="opSummary,pagination" >Next Page</apex:commandLink>&nbsp;|&nbsp;
+                                        <apex:commandLink action="{!lastPage}"  rerender="opSummary,pagination" >Last Page</apex:commandLink>
+                                    </apex:outputPanel>
+                                    <apex:outputPanel rendered="{!NOT(currentPage < totalPages && totalPages>1)}">
+                                        <i style="color:gray">Next Page</i>&nbsp;|&nbsp;
+                                        <i style="color:gray">Last Page</i>
+                                    </apex:outputPanel>
+                             </apex:outputPanel>                                   
+                             </apex:outputPanel>
+                               
+                            </apex:pageBlocksectionitem>
+
+
+                        </apex:pageBlockSection>
+                        </apex:outputPanel>
+                        </apex:outputPanel>   
+
+
+                    </apex:pageBlock>
+ 
+                </td>
+                                        
+            </tr>                    
+        </table>
+
+
+        </apex:pageBlock>    
+
+    </apex:form>
+    
+</apex:page>

@@ -1,0 +1,41 @@
+<aura:documentation>
+    <aura:description>
+        <p>
+            This component places a big red button on the screen  
+            that, when pressed, plays a humorous mp3 sound effect.
+        </p>
+        <p style="text-decoration:underline">Invocation:</p>
+        <pre>
+            &lt;c:panicbutton message="Boom!" sound="Explosion"&gt;
+        </pre>	
+        <p>Valid values for <em>sound</em> include:</p>
+        
+        <table>
+            <tr>
+                <th>Sound</th>
+                <th>Description</th>
+            </tr>
+            
+            <tr>
+                <td>Sad Trombone</td>
+                <td>Funny Sad Trombone Failure</td>
+            </tr>
+            
+            <tr>
+                <td>Explosion</td>
+                <td>Things that go boom!</td>
+            </tr>
+            
+        </table> 
+        
+    </aura:description>
+   
+    <aura:example 
+                  name="PanicButtonExample1" 
+                  ref="c:PanicButtonExample1" 
+                  label="Simple Instantiation">
+        Plays Sad Trombone and displays a custom message
+    </aura:example>
+    
+
+</aura:documentation>

@@ -1,0 +1,5 @@
+<aura:component >
+	<c:PanicButton sound="Sad Trombone"
+        message="What could possibly go wrong?" />
+    
+</aura:component>

@@ -1,0 +1,6 @@
+<aura:event type="COMPONENT" description="Raise to indicate a record op" >
+    <aura:attribute name="type" type="String" />
+    <aura:attribute name="recordId" type="String" />
+    <aura:attribute name="label" type="String" />
+    
+</aura:event>

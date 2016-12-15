@@ -1,0 +1,12 @@
+<design:component>
+	<design:attribute name="sound"
+                      label="Sound"
+                      description = "Sound file to play"
+                      datasource="Sad Trombone,Explosion">
+    </design:attribute>
+    
+    <design:attribute name="message"
+                      label="Message"
+                      description="Message to display">
+    </design:attribute>
+</design:component>

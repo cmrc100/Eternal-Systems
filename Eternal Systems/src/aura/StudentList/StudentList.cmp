@@ -1,0 +1,74 @@
+<aura:component controller="StudentList">
+
+	<aura:attribute name="studentName" type="String" default="" />
+	<aura:attribute name="courseId" type="String" default="" />
+	<aura:attribute name="startDate" type="String" default="" />
+	<aura:attribute name="endDate" type="String" default="" />
+	
+	<aura:method name="refresh" 
+	      action="{!c.doInit}" 
+	      access="PUBLIC"
+	      description="Re-invokes doInit() method" />
+	
+	
+	<aura:dependency resource="markup://c:modalDialog" />
+
+	<aura:handler name="init"
+		value="{!this}"
+		action="{!c.doInit}" />
+				
+	<aura:handler name="rowclick"
+		event="c:DataGridRowClick"
+		action="{!c.onListItemClick}" />
+	
+	<aura:registerEvent name="recordaction"
+		type="c:recordAction" />
+	
+	<aura:attribute name="rows"
+		type="Object[]"
+		access="PUBLIC"
+		description="The row data."/>
+		
+	<aura:attribute name="selectedRecordId"
+		type="String"
+		access="private"
+		description="The currently selected record id"
+		default=""/>		
+
+	<aura:attribute name="selectedRowEl"
+		type="Object"
+		access="private"
+		description="The currently selected record element"
+		default=""/>	
+			
+	<c:Titlebar title="Students"
+  		menu="View,Edit,Delete"
+  		buttonLeft="true"
+  		buttonRight="true"
+  		buttonRightIcon="utility:threedots"
+  		menuPress="{!c.onMenuClick}"/>  		
+        
+        {!v.body}
+
+
+	    <div class="slds-scrollable--y studentlist">
+	        <c:DataGrid aura:Id="grid">
+	            <c:DataGridColumn label="Name" />
+	            <c:DataGridColumn label="Course" />
+	            <c:DataGridColumn label="Date" />
+	            <c:DataGridColumn label="E-Mail" hidden="true" />
+	            <c:DataGridColumn label="Tel" hidden="true" />
+	            
+	            <aura:iteration items="{!v.rows}" var="row">
+		            <c:DataGridRow pk="{!row.pk}" 
+		                           data="{!row.data}" 
+		                           delimiter="{!row.delimiter}" />
+				</aura:iteration>
+	            
+	        </c:DataGrid>
+	    </div>
+
+        
+        <div aura:id="optionalModalDialog" />
+           			
+</aura:component>

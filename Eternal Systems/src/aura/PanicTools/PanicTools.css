@@ -1,0 +1,28 @@
+.THIS.toolbar {
+    padding: 5px;
+    border-bottom: 1px solid #EEF1F6;
+}
+
+.THIS.cardContainer {
+    position: relative;
+    display: flex;
+    flex: 1 0 auto;
+    height: calc(100% - 50px);
+}
+
+.THIS .card {
+    transition: .2s opacity linear;
+    visibility: visible;
+    overflow: auto;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    position: absolute !important;
+    opacity: 1;
+}
+
+.THIS .card--off {
+   opacity: 0;         
+   visibility: hidden;  
+}

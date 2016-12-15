@@ -1,0 +1,6 @@
+<aura:tokens extends="force:base">
+	
+    <aura:token name="myGridFont"
+        value="Comis Sans MS" />
+    
+</aura:tokens>

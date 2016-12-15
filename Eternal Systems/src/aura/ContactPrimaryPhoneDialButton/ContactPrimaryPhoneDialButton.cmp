@@ -1,0 +1,8 @@
+<aura:component implements="flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId" access="global" controller="ContactPrimaryPhoneDialButtonController">
+
+    <aura:attribute name="contactPhone" type="String" default="" />
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+    
+    <c:DialButton phoneNumber="{!v.contactPhone}" />
+    
+</aura:component>

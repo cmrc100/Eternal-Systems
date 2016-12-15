@@ -1,0 +1,69 @@
+<aura:component >
+
+    <aura:attribute name="title" required="true" type="String" access="GLOBAL" description="The title to appear centered in the bar"/>
+    
+    <aura:attribute name="buttonLeft" type="Boolean" default="true" access="GLOBAL" description="Display a left button"/>
+    <aura:attribute name="buttonLeftIcon" type="String" default="utility:back" access="GLOBAL" description="Icon category for left button"/>
+    <aura:attribute name="buttonLeftAction" type="Aura.Action" access="GLOBAL" description="Left button click handler" default="{!c.onBackButtonPress}" />
+
+
+
+    <aura:attribute name="buttonRight" type="Boolean" default="true" access="GLOBAL" description="Display a left button"/>
+    <aura:attribute name="buttonRightIcon" type="String" default="utility:add" access="GLOBAL" description="Icon category for left button"/>
+    <aura:attribute name="buttonRightAction" type="Aura.Action" access="GLOBAL" description="Right button click handler" />
+
+	<aura:attribute name="menu" type="List" default="" description="Optional Menu Items" />
+	<aura:attribute name="menuPress" type="Aura.Action" description="Click handler for menu items" />
+	
+	<aura:registerEvent name="backbuttonpress" type="c:BackButtonPress" description="" />
+	
+  	<lightning:layout horizontalAlign="spread" class="slds-theme--alt-inverse">
+  		<lightning:layoutItem size="2" padding="around-small">
+  			<aura:if isTrue="{!v.buttonLeft}">
+  				<lightning:buttonicon iconName="{!v.buttonLeftIcon}" onclick="{!v.buttonLeftAction}" />  										
+  			</aura:if>
+  		</lightning:layoutItem>
+  		
+  		<lightning:layoutItem size="8" class="slds-align-middle slds-text-align--center" >
+  			<h2 class="slds-text-heading--small">
+  				{!v.title}
+  			</h2>
+  		</lightning:layoutItem>
+  		
+		<lightning:layoutItem size="2" 
+                              class="slds-text-align--right"
+                              padding="around-small">
+            <aura:if isTrue="{!v.buttonRight}">
+                
+                <aura:if isTrue="{!v.menu.length == 0}">
+                    
+                    <lightning:buttonIcon iconName="{!v.buttonRightIcon}"    
+                                          onclick="{!v.buttonRightAction}" 
+                                           variant="border-inverse"
+                                           />
+                    
+                    <aura:set attribute="else">
+                        <lightning:buttonMenu iconName="{!v.buttonRightIcon}"
+                                              onselect="{!v.menuPress}"
+                                              variant="border-inverse">
+                            
+                            <aura:iteration items="{!v.menu}"  var="menuItem">
+                                <lightning:menuitem label="{!menuItem}" value="{!menuItem}" />
+                            </aura:iteration>
+                            
+                          
+                        </lightning:buttonMenu>
+                        
+                    </aura:set>
+                    
+                </aura:if>
+            </aura:if>
+            
+        </lightning:layoutItem>
+	
+	</lightning:layout>
+	
+  		
+  	
+  		
+</aura:component>

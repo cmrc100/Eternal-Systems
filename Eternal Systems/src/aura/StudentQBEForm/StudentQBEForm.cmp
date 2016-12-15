@@ -1,0 +1,62 @@
+<aura:component extends="c:DataComponent" controller="StudentQBEForm">
+
+	<aura:attribute name="studentName" type="String" default="" />
+	<aura:attribute name="courseId" type="String" default="" />
+	<aura:attribute name="startDate" type="String" default="" />
+	<aura:attribute name="endDate" type="String" default="" />
+	
+	<aura:attribute name="courses" type="Object[]" default="[]" />
+	
+	<aura:handler name="init"
+		value="{!this}"
+		action="{!c.doInit}" />
+		
+	<aura:handler name="change"
+		value="{!v.studentName}"
+		action="{!c.validateData}" />	
+	
+	<aura:registerEvent name="formsubmit" type="c:FormSubmit" description="" />
+	
+	<form class="slds-form--stacked" style="padding:5px">
+	
+		<lightning:input type="text"
+			name="studentName"
+			aura:id="studentName"
+			label="Student Name"
+			value="{!v.studentName}"
+			required="true"/>
+			
+		<lightning:select name="courseId"
+			aura:id="courseId"
+			label="Select Course"
+			value="{!v.courseId}">
+			
+			<aura:iteration items="{!v.courses}" var="option">
+				<option value="{!option.value}">
+					{!option.label}
+				</option>
+			</aura:iteration>
+
+		</lightning:select>	
+
+		<lightning:input type="date"
+			name="startDate"
+			aura:id="startDate"
+			label="Start Date"
+			value="{!v.startDate}"/>
+			
+		<lightning:input type="date"
+			name="endDate"
+			aura:id="endDate"
+			label="End Date"
+			value="{!v.endDate}"/>
+			
+		<div class="slds-text-align--center">
+			<lightning:button label="Search" aura:id="btnSubmit" disabled="true" onclick="{!c.submitForm}"/>
+		
+		</div>			
+						
+	
+	</form>
+	
+</aura:component>

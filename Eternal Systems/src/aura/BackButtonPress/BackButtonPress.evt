@@ -1,0 +1,1 @@
+<aura:event type="COMPONENT" description="User pressed a back button" />

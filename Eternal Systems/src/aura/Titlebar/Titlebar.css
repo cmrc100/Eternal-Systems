@@ -1,0 +1,16 @@
+.THIS {
+	border-bottom: 1px solid silver;
+}
+
+.THIS .slds-dropdown--left{	
+	left: auto !important;
+	right: 0 !important;
+	transform: translateX(0) !important;
+	
+}
+
+.THIS .slds-dropdown a{	
+	color: black !important;
+	text-decoration: none !important;
+	
+}

@@ -31,12 +31,14 @@
 	          helper.showCard(component,"studentEditView");
 	          break;
 	        case 'Delete' :
-	          //alert("Function not available");
+	          alert("Function not available");
+	          /*
 	          helper.alert(
 		          component,
 		          "Not Available",
 		          $A.get("$Label.c.FeatureNotAvailable")
-		        ); 
+		        );
+ 			 */
 	          break;
 	    }
 	},

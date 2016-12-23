@@ -1,0 +1,110 @@
+@media only screen and (max-width: 500px) {    
+    
+    
+  .THIS div[role=tabpanel] {
+        height: calc(100% - 50px) !important;
+        padding: 0px;
+    }
+    
+     
+    .THIS .uiScrollerWrapper, .THIS .slds-tabs--default {
+        height: 100%;
+    }
+    
+    .THIS a[role=tab]:before {
+        position: absolute;
+        top: -5px; 
+        padding-left: 18px;
+        font-size: 2em;
+    } 
+    
+    .THIS li[title="Report"] a[role=tab]:before{
+        
+        padding-left: 13px;
+    }
+    
+    .THIS li[title="Panic"] a[role=tab]:before{
+        
+        padding-left: 6px;
+    }
+
+    .THIS li[title="News"] a[role=tab]:before{
+        
+        padding-left: 6px;
+    }
+    
+    .THIS .slds-tabs--default__nav {
+         position: fixed;
+         bottom: 10px;
+         width: 100%;
+         border-bottom: inherit;
+         border-top: 1px solid #d8dde6;
+    }
+    
+    .THIS .slds-tabs--default__nav a {
+        border-bottom: inherit !important;
+        border-top: 2px solid transparent;
+        padding: 14px 8px !important;
+        font-size: 0.8em;
+    }
+    
+    .THIS .slds-tabs--default__nav a:hover,  .THIS .slds-tabs--default__nav a:focus {
+        border-top: 2px solid #0070d2;
+    }
+    
+    .THIS .slds-tabs--default__nav a:focus {
+        box-shadow: none;
+    }
+    
+    .THIS .slds-tabs--default__nav a:active {
+       border-color: #0070d2;
+       border-bottom: 0px !important;
+    }
+    
+    .THIS .slds-tabs__content {
+        padding: 0px !important;
+        height: calc(100% - 50px);
+    }
+    
+    .THIS .slds-text-heading--label {
+        letter-spacing: 0rem;
+        margin: auto;
+    }
+}
+
+
+@media only screen and (min-width:501px) {
+  .THIS .slds-tabs--default__nav {
+      position: fixed;
+      width:50px;
+      height: 100%;
+      background-color: #14315D;
+      display: inherit;
+  } 
+  .THIS a[role=tab]:before {
+    font-size: 1.3em;
+    color: #faebd7;
+  }
+  .THIS .slds-tabs--default__nav .slds-tabs__item a {
+    color: transparent;      
+  }  
+  .THIS div[role=tabpanel] {
+    margin-left: 51px;
+    padding: 0px !important;
+    height: 100% !important;
+  }
+  .THIS .slds-tabs--default .slds-tabs__item.slds-active a {
+    border-bottom: none !important;
+    border-right: 2px solid #0070d2 !important;
+  }
+}
+
+@media only screen and (min-width:48em) {
+  .THIS .slds-tabs--default__nav a {
+    padding: 0 0.5rem !important;
+  }
+
+  .THIS .slds-tabs--default__nav .slds-tabs__item + .slds-tabs__item {
+    margin-left: 0px !important;
+  }
+}

@@ -271,7 +271,7 @@ public with sharing class AnalyticSearchController {
     /************************/
    	/***** TEST METHODS *****/
    	/************************/
-   
+/*   
    
     private static TestMethod Void Test_AnalyticSearch() {
 
@@ -431,5 +431,6 @@ public with sharing class AnalyticSearchController {
 	   
     Test.stopTest();
     }    
-     
+*/
+    
 }

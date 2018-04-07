@@ -1,0 +1,11 @@
+<aura:component controller="myDataCollectorController" implements="force:appHostable,flexipage:availableForAllPageTypes,forceCommunity:availableForAllPageTypes" access="global" >
+	
+    <aura:attribute name="theRecords" type="SObject[]" />
+	<aura:attribute name="theFields" type="string[]" />
+    
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" />    
+    
+    {!v.body} 
+
+    
+</aura:component>

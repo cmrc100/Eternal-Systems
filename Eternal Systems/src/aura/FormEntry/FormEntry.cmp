@@ -1,0 +1,71 @@
+<aura:component implements="flexipage:availableForAllPageTypes,forceCommunity:availableForAllPageTypes" access="global" controller="FormEntryController" >
+
+<aura:attribute name="contact" type="Contact" 
+               default="{ 'sobjectType': 'Contact' }"/>
+
+<span>
+    <force:inputField aura:id="contactName" 
+                 value="{!v.contact.Name}"/><span class="slds-truncate">
+            <lightning:icon iconName="utility:info" size="x-small" class="slds-icon slds-icon--selected slds-icon--x-small slds-icon-text-default slds-m-right--x-small" />the name
+          </span>
+
+</span>    
+<force:inputField aura:id="testDate" 
+                 value="{!v.contact.Test_Date__c}"/>    
+
+<force:inputField aura:id="testMultiPicklist" 
+                 value="{!v.contact.Test_Multi_Picklist__c}"/>  
+
+    <br/>
+    <br/>
+    <br/>
+
+    <div class="slds-form-element slds-p-horizontal--medium slds-size--1-of-2">
+                    
+                        
+        <ui:inputText value="hello!"/>
+                        <span data-help="some help text goes here" data-field="" onmouseenter="{!c.popTitle}" id="contactName2-help" title="test">
+
+                            <lightning:icon iconName="utility:info" alternativeText="get help" size="xx-small" />
+                            
+                      </span>
+		                        
+                      
+                  
+    </div>
+    
+    <br/>
+    <br/>
+    
+<div class="slds-form-element slds-p-horizontal--medium slds-size--1-of-1">
+                    
+                    <!--show label-->
+					<div aura:id="profit_help" class="slds-popover slds-popover--tooltip slds-nubbin--bottom-left slds-hide profit_help" role="tooltip" aria-live="polite">
+                        <div class="slds-popover__body slds-text-longform">
+                            <p>hello monkey man</p>
+                        </div>
+    				</div>    
+                    <label class="slds-form-element__label" for="monkey">Show me the help text</label>
+                                           
+                   <span  data-field="monkey" onmouseover="{!c.popTitle}"  id="monkey1_help" title="">
+
+                            <lightning:icon iconName="utility:info" alternativeText="get help" size="xx-small" />
+                            
+                      </span>
+
+                  <!--show help-->
+                  <label aura:id="monkey1a"  for="monkey" class="slds-hide">its the monkey man</label>
+<div class="slds-popover slds-popover_tooltip slds-nubbin_bottom-left slds-hide" role="tooltip" id="monkey1" aura:id="monkey1" style="position: absolute; top: -15px; left: 15px;">
+    <div class="slds-popover__body">it's the monkey man again</div>
+  </div>
+    
+    	<div class="slds-form-element__control">    
+   
+            <ui:inputText value="hello!" aura:id="monkey"/>
+            
+    	</div>    
+    </div>                       
+    
+    
+    
+</aura:component>

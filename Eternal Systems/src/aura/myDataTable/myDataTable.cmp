@@ -1,0 +1,10 @@
+<aura:component implements="flexipage:availableForAllPageTypes,forceCommunity:availableForAllPageTypes" access="global" >
+	
+    <aura:attribute name="theRecords" type="SObject[]" access="global"/>
+    <aura:attribute name="theFields" type="string[]" access="global"/>
+    
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+    
+    <ui:outputText value="hello" />
+    
+</aura:component>

@@ -1,0 +1,25 @@
+<design:component >
+	
+    <design:attribute name="mapRecordTypeId" label="Record Type Id for which Map should be displayed" description="The Record Type Id which determines whether a Map should be displayed" />    
+    <design:attribute name="objectName" 	label="API Object Name to save Map Location values" description="API Object Name to save Map Location data values"/>
+    <design:attribute name="parentIdField" 	label="API Field Name of master record Parent Id" description="API Field name of master record Parent Id"/>
+    <design:attribute name="recordTypeId" 	label="Record Type Id for created record" description="Record Type Id for the newly created record"/>
+    <design:attribute name="editMode" 	label="Flag to indicate component is on an existing record, for edit" description="Select this if the component is on an existing Street Contact record"/>
+    <design:attribute name="lngLat" 	label="API Field Name to save Longitude/latitude" description="The API field name to save Longitude/Latitude. This is case sensitive and should match the Object configuration. If value is not required to be saved, leave blank."/>
+    <design:attribute name="locationUrl" 	label="API Field Name to save Location URL" description="The API field name to save Location URL. This is case sensitive and should match the Object configuration. If value is not required to be saved, leave blank."/>
+    <design:attribute name="address" 	label="API Field Name to save Street Address" description="The API field name to save the Street Address. This is case sensitive and should match the Object configuration. If value is not required to be saved, leave blank."/>
+    <design:attribute name="postCode" label="API Field Name to save Address Post Code" description="The API field name to save the Post Code. This is case sensitive and should match the Object configuration. If value is not required to be saved, leave blank."/>
+    <design:attribute name="city" label="API Field Name to save Address City" description="The API field name to save the City. This is case sensitive and should match the Object configuration. If value is not required to be saved, leave blank."/>
+    <design:attribute name="lsoa" label="API Field Name to save LSOA name" description="The API field name to save LSOA name. This is case sensitive and should match the Object configuration. If value is not required to be saved, leave blank."/>
+    <design:attribute name="lsoaCode" label="API Field Name to save LSOA Code" description="The API field name to save LSOA code. This is case sensitive and should match the Object configuration. If value is not required to be saved, leave blank."/>
+    <design:attribute name="msoa" label="API Field Name to save MSOA name" description="The API field name to save MSOA name. This is case sensitive and should match the Object configuration. If value is not required to be saved, leave blank."/>
+    <design:attribute name="msoaCode" label="API Field Name to save MSOA Code" description="The API field name to save MSOA code. This is case sensitive and should match the Object configuration. If value is not required to be saved, leave blank."/>
+    <design:attribute name="localAuthority" label="API Field Name to save Local Authority Name" description="The API field name to save the Local Authority name. This is case sensitive and should match the Object configuration. If value is not required to be saved, leave blank."/>
+    <design:attribute name="ward" label="API Field Name to save Ward name" description="The API field name to save the Ward name. This is case sensitive and should match the Object configuration. If value is not required to be saved, leave blank."/>
+    <design:attribute name="wardCode" label="API Field Name to save Ward code" description="The API field name to save the Ward code. This is case sensitive and should match the Object configuration. If value is not required to be saved, leave blank."/>
+    <design:attribute name="borough" label="API Field Name to save Borough name" description="The API field name to save the Borough name. This is case sensitive and should match the Object configuration. If value is not required to be saved, leave blank."/>
+    <design:attribute name="googleMapApiKey" label="Google Maps API Key" description="The Google Maps API key to use"/>
+    <design:attribute name="mapItApiKey" label="MapIt Service API Key" description="The MapIt API key to use"/>
+    <design:attribute name="defaultLocationPostcode" label="Default Location Post Code" description="When first loading map, enter the post code that should be used to centre the Map location. If left blank, the location will default to current location of user, unless a record is being amended in which case the map will centre to the location of the saved record."/>
+    
+</design:component>

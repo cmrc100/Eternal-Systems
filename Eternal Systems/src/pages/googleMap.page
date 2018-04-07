@@ -1,0 +1,532 @@
+<apex:page showHeader="false" controller="StreetContactMapController">
+<apex:slds />
+    <html>
+
+        <head>
+
+            <style>
+
+                body {         
+                    font:14px sans-serif;           
+                } 
+                input {
+                    margin: 0.6em 0.6em 0; 
+                    width:398px;
+                }
+                  #mapCanvas {
+                    width: 98%;
+                    height: 600px;
+                	float: left;
+                  }
+                  #infoPanel {
+                    float: left;
+                    margin-left: 5px;
+                  }
+                  #infoPanel div {
+                    margin-bottom: 5px;
+                  }      
+                }
+                
+    		</style>
+            
+        </head>
+        
+        <body>
+
+		<div class="slds-scope">    
+
+            <apex:form id="frmMain">            
+        
+                <apex:pageBlock title="Street Contact Location" mode="edit" id="thePageBlock">
+        
+					<div class="slds-grid slds-wrap">                
+                        <div class="slds-size_1-of-2">
+                            
+                            <apex:commandButton id="cancel" value="Cancel" style="width:40%;" styleClass="slds-button slds-button--brand slds-button_small"  oncomplete="cancelMap();return true;"      >
+                            </apex:commandButton> 
+                            
+							
+                        </div>						
+                        <div class="slds-size_1-of-2">
+                            <apex:commandButton id="continue" value="Continue" style="width:40%;" styleClass="slds-button slds-button--brand slds-button_small"  oncomplete="saveLocation();return true;"      >
+                            </apex:commandButton>
+                            <script>
+        						var btnContinue = document.getElementById('{!$Component.continue}');
+    						</script>
+                        </div>
+
+                    </div>    
+        
+                </apex:pageBlock>
+                <apex:PageMessages id="msgs" />
+                    
+            </apex:form>
+            <input type="hidden" id="msg"/>
+            <input id="searchTextField" type="text" size="50"/>  
+            <p></p>
+                      
+            <div class="slds-grid slds-wrap">
+            	<div class="slds-col slds-size--1-of-2 slds-medium-size--5-of-6 slds-large-size--8-of-12"> 
+                    <div id="mapCanvas" ></div>
+                    <br/>
+            	</div>
+                <div class="slds-col slds-size--1-of-2 slds-medium-size--1-of-6 slds-large-size--4-of-12">     
+                    <div id="infoPanel">            
+                        <b>Marker status:</b>
+                        <div id="markerStatus"><i>Click and drag the marker.</i></div>
+                        <b>Current position:</b>
+                        <div id="info"></div>
+                        <b>Closest matching address:</b>
+                        <div id="address"></div>
+						<b>City:</b>
+                        <div id="city"></div>
+                        <b>Post Code:</b>
+                        <div id="postcode"></div>
+                        <b>Local Authority:</b>
+                        <div id="localAuthority"></div>
+                        <div id="boroughLabel"> <b>Borough:</b> </div>
+                        <div id="borough"></div>
+                        <div id="wardLabel"> <b>Ward:</b> </div>
+                        <div id="ward"></div>
+                        <div id="wardCodeLabel"><b>Ward Code:</b></div>
+                        <div id="wardCode"></div>
+                        <b>LSOA Name:</b>
+                        <div id="LSOAName"></div>
+                        <b>LSOA Code:</b>
+                        <div id="LSOACode"></div>
+                        <b>MSOA Name:</b>
+                        <div id="MSOAName"></div>
+                        <b>MSOA Code:</b>
+                        <div id="MSOACode"></div>        
+                    </div>                
+                </div>
+            </div>
+    
+            <apex:pageBlock id="hiddenBlock" rendered="false">
+    
+            
+            </apex:pageBlock>
+
+    		<script type="text/javascript"> 
+        		
+                Visualforce.remoting.timeout = 120000;
+                Visualforce.remoting.buffer = true;        
+                Visualforce.remoting.escape = false;
+        
+                var marker = null;
+            	var latLng = null;
+            	var geocoder = null;
+                var lexOrigin = 'https://{!$CurrentPage.parameters.lcHost}';
+            	var editMode = false;
+
+                //Data for Google map
+                var data;
+        
+                //Send message to LC
+                function sendToLC(message) {
+
+                    if(typeof(lexOrigin) != 'undefined'){
+                        parent.postMessage(JSON.parse(JSON.stringify(message)), lexOrigin);
+                    }
+                }
+
+                //Receive message from LC
+                window.addEventListener("message",messageHandler , false);
+
+				function messageHandler(event) {
+        
+                    // If page is public (like used in force.com sites) then be careful about the origin
+                    //if (event.origin !== lexOrigin) {
+                        // Not the expected origin: reject message!
+                        //return;
+                    //}
+        
+                    // Handle message
+                    console.log('Data Sent to VF: ', event.data);
+        console.log(event.data.loadGoogleMap);
+                    data = event.data;
+        
+                    if(typeof(event.data.loadGoogleMap) != 'undefined'){
+                        //Load Google Map Script
+        console.log('Loading .... apiKey  ' + event.data.googleMapApiKey);
+                        var script = document.createElement("script");
+                        editMode = event.data.editMode;
+                      
+                        if (editMode == true){                            
+                        	btnContinue.value = "Save and Continue";    
+                        }
+                        script.src = "https://maps.googleapis.com/maps/api/js?key=" + event.data.googleMapApiKey + "&callback=initialize&sensor=false&libraries=places";
+                        document.getElementsByTagName("head")[0].appendChild(script);        
+                    }
+        
+                }         
+
+                function hideDiv(divId) {
+                    var element = document.getElementById(divId);
+                    element.classList.add("slds-hide");
+                }
+            
+                function initialize() {
+
+                    var input = /** @type {HTMLInputElement} */(document.getElementById('searchTextField'));
+                    var autocomplete = new google.maps.places.Autocomplete(input);
+
+					google.maps.event.addDomListener(input, 'keydown', function(e) { 
+                        if (e.keyCode == 13) {
+                            //alert('Please select from list'); 
+                            var searchText = document.getElementById('searchTextField').value;
+                            console.log(searchText);
+                            if (searchText != null){
+                                google.maps.event.trigger(autocomplete, 'place_changed');
+                                
+                                e.preventDefault();
+                                return false;                    
+                                
+                            } 
+                         }
+              		});
+                    geocoder = new google.maps.Geocoder();
+
+                    var mapData = data.mapData;
+                    var ward = data.ward;
+                    if(!ward){
+                    	hideDiv("wardLabel");
+                        hideDiv("ward");	    
+                    }    
+                    var wardCode = data.wardCode;
+                    if(!wardCode){
+                    	hideDiv("wardCodeLabel");
+                        hideDiv("wardCode");	    
+                    }                    
+                    var borough = data.borough;
+                    if(!borough){
+                    	hideDiv("boroughLabel");
+                        hideDiv("borough");	    
+                    }                    
+        			var map = new google.maps.Map(document.getElementById('mapCanvas'), {
+                        zoom: 15,
+                        mapTypeId: google.maps.MapTypeId.ROADMAP
+                    });
+					if (data.defaultLocationPostcode && mapData.length == 0){
+						var address = data.defaultLocationPostcode;
+    					geocoder.geocode( { 'address': address}, function(results, status) {
+      						if (status == google.maps.GeocoderStatus.OK) {
+                                var lat = results[0].geometry.location.lat();
+                                var lng = results[0].geometry.location.lng();
+                                latLng= new google.maps.LatLng(lat, lng);
+                                updateMarker(latLng);                             
+                            }
+      					});                        
+                    }    
+                    else if (mapData.length > 0) {
+                    	latLng = new google.maps.LatLng(mapData[0].lat, mapData[0].lng);
+                        updateMarker(latLng);
+                    } else {
+                        if (navigator.geolocation) {
+                        	navigator.geolocation.getCurrentPosition(function (position) {
+                            latLng= new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
+                            updateMarker(latLng);                                
+                         }, noGPS );
+                     }
+                     function noGPS(err){
+
+                         alert('Unable to establish current location');
+                         initMarkerEvents(marker);
+                     }                                            
+                    }    
+                                                                           
+                    function updateMarker(clatLng){
+                        if (marker) {
+                        	marker.setMap(null);
+                        }    
+                        marker = new google.maps.Marker({
+                                position: clatLng,
+                                title: 'Location',
+                                map: map,
+                                draggable: true
+                            });
+                        latLng = clatLng;
+                        map.setCenter(latLng);
+                        initMarkerEvents(marker);    
+                        
+                        updateMarkerPosition(clatLng);
+                        geocodePosition(clatLng);
+                        getLocalAuthority();            
+                    }
+
+					function initMarkerEvents(marker){     
+                        // Add dragging event listeners.
+                        google.maps.event.addListener(marker, 'dragstart', function() {
+                            updateMarkerAddress('Dragging...');
+                        });
+                      
+                        google.maps.event.addListener(marker, 'drag', function() {
+                            updateMarkerStatus('Dragging...');
+                            updateMarkerPosition(marker.getPosition());
+                        });
+                      
+                        google.maps.event.addListener(marker, 'dragend', function() {
+                            updateMarkerStatus('Drag ended');
+                            geocodePosition(marker.getPosition());                    
+                            getLocalAuthority();
+                        })
+                    
+                        autocomplete.bindTo('bounds', map);
+            
+                
+            		}                     
+ 
+                
+                    var infowindow = new google.maps.InfoWindow();
+                
+                    google.maps.event.addListener(autocomplete, 'place_changed', function() {
+                        infowindow.close();
+                        //marker.setVisible(false);
+                        input.className = '';
+                        var place = autocomplete.getPlace();
+                        if (!place.geometry) {
+                          // Inform the user that the place was not found and return.
+                          input.className = 'notfound';
+                          return;
+                        }
+                
+                        // If the place has a geometry, then present it on a map.
+                        if (place.geometry.viewport) {
+                          map.fitBounds(place.geometry.viewport);
+                        } else {
+                          map.setCenter(place.geometry.location);
+                          map.setZoom(17);  // Why 17? Because it looks good.
+                        }
+          
+                        marker.setPosition(place.geometry.location);
+                        marker.setVisible(true);      
+                        var address = '';
+                        if (place.address_components) {
+                          address = [
+                            (place.address_components[0] && place.address_components[0].short_name || ''),
+                            (place.address_components[1] && place.address_components[1].short_name || ''),
+                            (place.address_components[2] && place.address_components[2].short_name || '')
+                          ].join(' ');
+                    
+                        }
+                        geocodePosition(marker.getPosition());
+                        updateMarkerPosition(marker.getPosition());
+                        
+                        //infowindow.setContent('<div><strong>' + place.name + '</strong><br>' + address);                    
+                        //infowindow.open(map, marker);
+                        
+                        getLocalAuthority();
+                       
+                
+                  });
+         
+                
+                   function getLocalAuthority(){
+                        
+                        var sLat = marker.getPosition().lat();
+                        var sLng = marker.getPosition().lng();
+                        var sAddress = document.getElementById('address').innerHTML;
+                        var sLngLat = document.getElementById('info').innerHTML;
+                        var sLocalAuthority = document.getElementById('localAuthority').innerHTML;
+                        var sWard = document.getElementById('ward').innerHTML;
+                        var sBorough = document.getElementById('borough').innerHTML;
+                         
+                        var href = "https://mapit.mysociety.org/point/4326/" + sLng + ',' + sLat + "?api_key=" + data.mapItApiKey;
+                        
+        
+                        Visualforce.remoting.Manager.invokeAction('{!$RemoteAction.StreetContactMapController.getMapPoint}', href, sAddress, 
+                                                                            sLngLat,  function (data, event) {
+        
+                            var oData = data.split('^');
+                          
+                            document.getElementById('localAuthority').innerHTML = oData[0];
+                            document.getElementById('ward').innerHTML = oData[2];               
+                            document.getElementById('borough').innerHTML = oData[3];  
+                            document.getElementById('LSOAName').innerHTML = oData[4];
+                            document.getElementById('LSOACode').innerHTML = oData[5];
+                            document.getElementById('MSOAName').innerHTML = oData[6];
+                            document.getElementById('MSOACode').innerHTML = oData[7];
+                            document.getElementById('wardCode').innerHTML = oData[8]; 
+                                                                           
+                            //document.getElementById('msg').value = oData[1];         
+                            document.getElementById('msg').value = '';
+            
+                            updateValues();
+                        });                
+
+                    }
+                    
+                     
+                
+                } //End of Initialize function
+
+                function geocodePosition(pos) {
+                    if (!geocoder)
+                        geocoder = new google.maps.Geocoder();
+                    geocoder.geocode({
+                    latLng: pos
+                  }, function(responses) {
+                    if (responses && responses.length > 0) {
+                    
+                      updateMarkerAddress(responses[0].formatted_address);
+                      updatePostCode(responses[0]);
+                    } else {
+                      updateMarkerAddress('Cannot determine address at this location.');
+                      updatePostCode('');
+                    }
+                    
+                  });
+        		}
+
+                function updateMarkerStatus(str) {
+                  document.getElementById('markerStatus').innerHTML = str;
+                }
+        
+                function updateMarkerPosition(latLng) {
+                  if (latLng) {
+                        document.getElementById('info').innerHTML = [
+                        latLng.lat(),
+                        latLng.lng()
+                      ].join(', ');
+                  }    
+                
+                }
+
+                function updateMarkerAddress(str) {
+                  document.getElementById('address').innerHTML = str;
+                }
+        
+                function updatePostCode(item) {
+                    var postcode = '';
+                    var city = '';
+                    if (item.length == 0){
+                        postcode = '';
+                    } else {
+                        for (var i = 0; i < item.address_components.length; i++)
+                          {
+                            var addr = item.address_components[i];                   
+                            var postcode;
+                            if (addr.types[0] == 'postal_code') 
+                              postcode = addr.long_name;
+                            
+                            if(addr.types[0] == 'locality')
+                              city = addr.long_name;
+                        }
+                    }
+                    document.getElementById('postcode').innerHTML = postcode;
+        			document.getElementById('city').innerHTML = city;
+                }            
+
+                //Let LC know that VF page been loaded along with it's URL
+                //LC will then send the data
+                //This is done because LC has no way to know that VF page in iFrame has been loaded, event listener set and ready for data
+                var vfHost = "{!LEFT($CurrentPage.URL,FIND('/',$CurrentPage.URL,9))}";
+    
+                sendToLC({'state':'LOADED', 'vfHost': vfHost});
+
+            </script>      
+
+    
+
+
+
+    <script type="text/javascript">
+        var valid = true;
+        var msg = '';
+        function saveLocation(){
+          
+            var id = "{!$CurrentPage.parameters.Id}";
+            var address = document.getElementById('address').innerHTML;
+            var lng = document.getElementById('info').innerHTML;
+            var lat = document.getElementById('info').innerHTML;
+            var localAuthority = document.getElementById('localAuthority').innerHTML;
+            var postcode = document.getElementById('postcode').innerHTML;
+            var city = document.getElementById('city').innerHTML;
+            var borough = document.getElementById('borough').innerHTML;
+            var ward= document.getElementById('ward').innerHTML;
+            var LSOACode= document.getElementById('LSOACode').innerHTML;
+            var LSOAName= document.getElementById('LSOAName').innerHTML;
+            var MSOACode= document.getElementById('MSOACode').innerHTML;
+            var MSOAName= document.getElementById('MSOAName').innerHTML;
+            var wardCode= document.getElementById('wardCode').innerHTML;
+             
+            var sMsg = document.getElementById('msg').value;
+           
+            
+           if (postcode == null || postcode.length == 0)
+           {
+                //valid = false;
+                valid = true;
+           }
+           
+           if (valid == false) {
+                alert ('Please move the marker slightly to select a location with a full postcode. This is due to limitations in the google mapping data');           
+            
+           } else {           
+
+                if (sMsg.length > 0 && id.length > 0){
+                    valid = false;
+                    alert(sMsg);
+                } else {   
+                    valid = true;
+
+						var message = {
+                            'state' : 'UPDATE',
+                            'editMode' : editMode,
+                            'address' : address,
+                            'city' : city,
+                            'lng': lng, 
+                            'lat': lat,  
+                            'localAuthority': localAuthority,
+                            'postcode': postcode,
+                            'ward': ward,
+                            'LSOACode' : LSOACode,
+                            'LSOAName' : LSOAName,
+                            'MSOACode' : MSOACode,
+                            'MSOAName' : MSOAName,
+                            'wardCode' : wardCode
+
+        				};
+
+					 sendToLC(message);               
+                }
+           
+           } 
+
+        }
+
+		function cancelMap(){
+			var message = {
+				'state' : 'CANCEL',
+                'editMode' : editMode
+				}
+            sendToLC(message);
+    	}
+        
+        function updateValues(){
+    
+            var id = "{!$CurrentPage.parameters.Id}";
+            var address = document.getElementById('address').innerHTML;
+            var lng = document.getElementById('info').innerHTML;
+            var lat = document.getElementById('info').innerHTML;
+            var localAuthority = document.getElementById('localAuthority').innerHTML;
+            var postcode = document.getElementById('postcode').innerHTML;
+            var borough = document.getElementById('borough').innerHTML;
+            var ward= document.getElementById('ward').innerHTML;        
+            var LSOACode= document.getElementById('LSOACode').innerHTML;
+            var LSOAName= document.getElementById('LSOAName').innerHTML;
+            var MSOACode= document.getElementById('MSOACode').innerHTML;
+            var MSOAName= document.getElementById('MSOAName').innerHTML;
+            var wardCode= document.getElementById('wardCode').innerHTML;
+
+    
+        }            
+
+
+    </script>
+	</div>
+    </body>
+    </html>
+    
+
+</apex:page>

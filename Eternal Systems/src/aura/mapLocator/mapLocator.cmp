@@ -1,0 +1,86 @@
+<aura:component implements="flexipage:availableForAllPageTypes,forceCommunity:availableForAllPageTypes,force:hasRecordId,force:hasSObjectName" access="global" >
+
+    <!-- Needed to send messages to VF page. But we will get it from VF itself -->
+    <aura:attribute name="vfHost" type="String" default="" />
+
+    <!-- Google Map options -->
+    <aura:attribute name="mapOptions" type="Object" default='{"zoom": 10, "mapTypeId : "google.maps.MapTypeId.ROADMAP" }' />
+    <aura:attribute name="mapOptionsCenter" type="Object" />
+
+    
+    <!-- Need to define object/field mappings for .. 
+    1. 		 Longitude/latitude
+    2.       Location URL
+    3.       Address
+    4.       Postcode
+    5.       City
+    6.       Local authority (mapit)
+    7.       Ward (mapit)
+    8.       LSOA (mapit)
+    9.       LSOA code (mapit)
+    10.   	 MSOA (mapit)
+    11.   	 MSOA code (mapit)
+    -->
+    <!-- Design Attributes -->
+    <aura:attribute name="editMode" type="Boolean" access="public" default="false" />
+	<aura:attribute name="recordTypeId" type="String" access="public" default="" />
+    <aura:attribute name="parentIdField" access="public" type="String" default="" description="API Field Name of master record Parent Id" />
+    <aura:attribute name="objectName" access="public" type="String" default=""  description="API Object Name to save Map Location values"/>    
+    <aura:attribute name="lngLat"  access="public" type="String" default=""  description="API Field Name to save Longitude/latitude"/>    
+    <aura:attribute name="locationUrl" access="public" type="String"  default="" description="API Field Name to save Location URL"/>
+	<aura:attribute name="address" 	access="public"	type="String" default="" description="API Field Name to save Street Address"/>
+    <aura:attribute name="postCode" access="public"	type="String" default="" description="API Field Name to save Address Post Code"/>
+	<aura:attribute name="city" access="public" type="String" default="" description="API Field Name to save Address City"/>
+    <aura:attribute name="localAuthority" access="public"	type="String" default="" description="API Field Name to save Local Authority name" />
+    <aura:attribute name="ward" access="public" type="String" default="" description="API Field Name to save Ward name" />
+    <aura:attribute name="wardCode" access="public" type="String" default="" description="API Field Name to save Ward code" />
+    <aura:attribute name="borough" access="public" type="String" default="" description="API Field Name to save the Borough name" />
+    <aura:attribute name="lsoa" access="public"	type="String" default="" description="API Field Name to save LSOA name" />
+	<aura:attribute name="lsoaCode" access="public"	type="String" default="" description="API Field Name to save LSOA Code" />
+    <aura:attribute name="msoa" access="public"	type="String" default="" description="API Field Name to save MSOA name" />
+    <aura:attribute name="msoaCode" access="public"	type="String" default="" description="API Field Name to save MSOA Code" />   
+    
+	<aura:attribute name="googleMapApiKey" access="public" type="String" default="" description="Google Maps API Key"/>
+    <aura:attribute name="mapItApiKey" access="public" type="String" default="" description="MapIt Service API Key"/>
+    <aura:attribute name="defaultLocationPostcode" access="public" type="String" default="" description=""/>
+    <aura:attribute name="parentId" type="String" access="public" />    
+    <aura:attribute name="saveObject" type="Sobject"   default="{ 'sobjectType': 'Contact'}"/>
+
+	<!-- Events -->
+    <aura:registerEvent name="evtMapClose" type="c:evtMapClose"/>    
+    <!--
+
+		Google map data for marker in following format
+
+		[{"lat":-25.363882, "lng":131.044922, "markerText":"This is an account"}]
+
+   	-->
+
+    <aura:attribute name="mapData" type="Object[]" />
+    <aura:attribute name="loadMap" type="Boolean" default="false" />
+
+    <!-- Domain of LC for VF to send message -->
+    <aura:attribute name="lcHost" type="String" />    
+
+    <aura:attribute name="record" type="Object"/>
+    <aura:attribute name="simpleRecord" type="Object"/>
+    <aura:attribute name="recordError" type="String"/>
+
+    <force:recordData aura:id="recordLoader"
+      recordId="{!v.recordId}"
+      layoutType="FULL"                      
+      targetRecord="{!v.record}"
+      targetFields="{!v.simpleRecord}"
+      targetError="{!v.recordError}"
+      mode="EDIT"                
+      />    
+    
+    <!-- Set listener from VF. This is to check when VF is loaded so we can send marker data -->
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+   
+    <div class="intrinsic-container intrinsic-container-16x9">
+    	<iframe aura:id="vfFrame" src="{! '/apex/googleMap?lcHost=' + v.lcHost +'&amp;edit=' + v.editMode}"  allow="geolocation *;allowfullscreen;" />
+    </div>    
+    
+    
+</aura:component>

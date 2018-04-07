@@ -1,0 +1,104 @@
+<aura:component controller="RecordTypeSelectorController" implements="flexipage:availableForRecordHome,force:hasRecordId,force:hasSObjectName,forceCommunity:availableForAllPageTypes,lightning:actionOverride,force:lightningQuickAction" access="global" >
+	
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+
+    <!-- Design Attributes -->
+    <aura:attribute name="editMode" type="Boolean" access="public" default="false" />
+	<aura:attribute name="recordTypeId" type="String" access="public" default="" />
+    <aura:attribute name="parentIdField" access="public" type="String" default="" description="API Field Name of master record Parent Id" />
+    <aura:attribute name="objectName" access="public" type="String" default=""  description="API Object Name to save Map Location values"/>    
+    <aura:attribute name="lngLat"  access="public" type="String" default=""  description="API Field Name to save Longitude/latitude"/>    
+    <aura:attribute name="locationUrl" access="public" type="String"  default="" description="API Field Name to save Location URL"/>
+	<aura:attribute name="address" 	access="public"	type="String" default="" description="API Field Name to save Street Address"/>
+    <aura:attribute name="postCode" access="public"	type="String" default="" description="API Field Name to save Address Post Code"/>
+	<aura:attribute name="city" access="public" type="String" default="" description="API Field Name to save Address City"/>
+    <aura:attribute name="localAuthority" access="public"	type="String" default="" description="API Field Name to save Local Authority name" />
+    <aura:attribute name="ward" access="public" type="String" default="" description="API Field Name to save Ward name" />
+    <aura:attribute name="wardCode" access="public" type="String" default="" description="API Field Name to save Ward code" />
+    <aura:attribute name="borough" access="public" type="String" default="" description="API Field Name to save the Borough name" />    
+    <aura:attribute name="lsoa" access="public"	type="String" default="" description="API Field Name to save LSOA name" />
+	<aura:attribute name="lsoaCode" access="public"	type="String" default="" description="API Field Name to save LSOA Code" />
+    <aura:attribute name="msoa" access="public"	type="String" default="" description="API Field Name to save MSOA name" />
+    <aura:attribute name="msoaCode" access="public"	type="String" default="" description="API Field Name to save MSOA Code" />   
+    
+	<aura:attribute name="googleMapApiKey" access="public" type="String" default="" description="Google Maps API Key"/>
+    <aura:attribute name="mapItApiKey" access="public" type="String" default="" description="MapIt Service API Key"/>
+    <aura:attribute name="defaultLocationPostcode" access="public" type="String" default="" description=""/>
+    
+    <aura:attribute name="mapRecordTypeLabel" type="String" default="Street activity (location known)" />
+    <aura:attribute name="mapRecordTypeId" type="String" default="" />
+    <aura:attribute name="recordId" type="String" />
+    <aura:attribute name="parentId" type="String" />
+    <aura:attribute name="recTypeIdMap" type="map" />
+    <aura:attribute name="objName" type="String" default="Action__c" />
+    
+    <aura:attribute name="lstOfRecordType" type="map" />
+    <aura:attribute name="isOpen" type="boolean" default="false" />
+    <aura:attribute name="mapContact" type="boolean" default="false" />
+
+    <aura:attribute name="record" type="Object"/>
+    <aura:attribute name="simpleRecord" type="Object"/>
+    <aura:attribute name="recordError" type="String"/>
+
+    <aura:attribute name="selectedRecType" type="String" default="" />
+    
+    <!-- Event Handlers -->
+    <aura:handler event="c:evtMapClose" name="evtMapClose" action="{!c.closeMap}"/>
+    
+    <force:recordData aura:id="recordLoader"
+      recordId="{!v.recordId}"
+      layoutType="FULL"              
+      targetRecord="{!v.record}"
+      targetFields="{!v.simpleRecord}"
+      targetError="{!v.recordError}"
+      />
+   
+    <aura:if isTrue="{!!v.mapContact}" >  
+        <div class="slds-grid slds-wrap">
+
+            <div class="slds-align--absolute-center  slds-size--1-of-2 slds-large-size--1-of-2">
+                <lightning:radioGroup aura:id="recTypes"
+                name="radioButtonGroup"
+                label="Select a Record Type"
+                options="{!v.lstOfRecordType}"
+                value=""
+                onchange="{!c.handleChange}"
+                required="true" />
+            </div>
+            <lightning:button class="slds-button slds-button--brand slds-align--right "  onclick="{!c.createRecord}">Next</lightning:button>
+        </div>                   
+        
+
+    
+
+    </aura:if>                                                                                                                                                                                                                                          
+    
+    <aura:if isTrue="{!v.mapContact}">             
+        <c:mapLocator recordTypeId="{!v.recordTypeId}" 
+                      parentId="{!v.parentId}"
+                      parentIdField="{!v.parentIdField}"
+                      editMode="false"
+                      objectName="{!v.objectName}"
+                      lngLat="{!v.lngLat}"
+                      locationUrl="{!v.locationUrl}"
+                      address="{!v.address}"
+                      postCode="{!v.postCode}"
+                      city="{!v.city}"
+                      localAuthority="{!v.localAuthority}"
+                      ward="{!v.ward}"
+                      wardCode="{!v.wardCode}"
+                      borough="{!v.borough}"
+                      lsoa="{!v.lsoa}"
+                      lsoaCode="{!v.lsoaCode}"
+                      msoa="{!v.msoa}"
+                      msoaCode="{!v.msoaCode}"
+					  googleMapApiKey="{!v.googleMapApiKey}"
+                      mapItApiKey="{!v.mapItApiKey}"
+                      defaultLocationPostcode="{!v.defaultLocationPostcode}" />
+        <br/>
+        
+    </aura:if>
+
+
+    
+</aura:component>
